@@ -1,0 +1,51 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+package-lock.json
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*.local
+.env.local
+.env.test
+.env.production
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# IDEs
+.idea/
+*.iml
+
+# PostgreSQL (data dir if accidentally included)
+pgdata/
+postgres-data/
+
+# Frontend / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# Other
+coverage/
+*.tgz
+*.env.*
