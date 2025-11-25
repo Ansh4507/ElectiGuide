@@ -1,83 +1,91 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 
+export default function StudentForm({ onUpdate }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    cgpa: '',
+    department: 'CSE', // Default
+    interests: ''
+  });
 
-const API = import.meta.env.VITE_API_URL || ''
+  // Whenever formData changes, send it to the parent (App.jsx)
+  useEffect(() => {
+    // We convert the comma-separated string of interests into an array for easier filtering later
+    const processedData = {
+      ...formData,
+      interests: formData.interests.split(',').map(s => s.trim().toLowerCase()).filter(s => s)
+    };
+    onUpdate(processedData);
+  }, [formData]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-export default function StudentForm(){
-const [name, setName] = useState('')
-const [email, setEmail] = useState('')
-const [departmentId, setDepartmentId] = useState(1)
-const [year, setYear] = useState(3)
-const [skills, setSkills] = useState('')
-const [msg, setMsg] = useState(null)
+  return (
+    <div className="space-y-4">
+      
+      {/* Name Field */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="John Doe"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+        />
+      </div>
 
+      {/* Department Field */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
+        <select
+          name="department"
+          value={formData.department}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+        >
+          <option value="CSE">Computer Science (CSE)</option>
+          <option value="IT">Information Tech (IT)</option>
+          <option value="ECE">Electronics (ECE)</option>
+          <option value="MECH">Mechanical</option>
+        </select>
+      </div>
 
-async function submit(e){
-e.preventDefault()
-setMsg(null)
-const payload = { name, email, department_id: Number(departmentId), year: Number(year), skills: skills.split(',').map(s=>s.trim()).filter(Boolean) }
-try{
-const res = await fetch(`${API}/api/students`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) })
-const data = await res.json()
-if (res.ok){
-setMsg({ type: 'success', text: 'Saved student ✔' })
-setName(''); setEmail(''); setSkills('')
-} else {
-setMsg({ type: 'error', text: data.error || 'Failed' })
-}
-}catch(err){
-console.error(err)
-setMsg({ type: 'error', text: 'Network error' })
-}
-}
+      {/* CGPA Field */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Current CGPA</label>
+        <input
+          type="number"
+          name="cgpa"
+          step="0.01"
+          max="10"
+          value={formData.cgpa}
+          onChange={handleChange}
+          placeholder="e.g. 8.5"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
 
-
-return (
-    <div className="bg-white p-6 rounded-2xl shadow">
-<h3 className="font-semibold mb-3">Add / Update Student</h3>
-<form onSubmit={submit} className="space-y-3 text-sm">
-<div>
-<label className="block text-slate-600">Name</label>
-<input value={name} onChange={e=>setName(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="Full name" required />
-</div>
-<div>
-<label className="block text-slate-600">Email</label>
-<input value={email} onChange={e=>setEmail(e.target.value)} type="email" className="w-full border rounded px-3 py-2" placeholder="you@college.edu" required />
-</div>
-<div className="grid grid-cols-2 gap-2">
-<div>
-<label className="block text-slate-600">Department</label>
-<select value={departmentId} onChange={e=>setDepartmentId(e.target.value)} className="w-full border rounded px-3 py-2">
-<option value={1}>CSE</option>
-<option value={2}>ECE</option>
-<option value={3}>IT</option>
-<option value={4}>IntCSE</option>
-</select>
-</div>
-<div>
-<label className="block text-slate-600">Year</label>
-<select value={year} onChange={e=>setYear(e.target.value)} className="w-full border rounded px-3 py-2">
-<option value={1}>1</option>
-<option value={2}>2</option>
-<option value={3}>3</option>
-<option value={4}>4</option>
-</select>
-</div>
-</div>
-
-
-<div>
-<label className="block text-slate-600">Skills (comma separated)</label>
-<input value={skills} onChange={e=>setSkills(e.target.value)} className="w-full border rounded px-3 py-2" placeholder="cloud, docker, react" />
-</div>
-
-
-<div className="flex items-center gap-2">
-<button className="px-4 py-2 bg-green-600 text-white rounded">Save student</button>
-{msg && <div className={`${msg.type==='success' ? 'text-green-600' : 'text-red-600'} text-sm`}>{msg.text}</div>}
-</div>
-</form>
-</div>
-)
+      {/* Interests Field */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Interests (Keywords)</label>
+        <textarea
+          name="interests"
+          value={formData.interests}
+          onChange={handleChange}
+          placeholder="e.g. machine learning, web dev, finance"
+          rows="3"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+        />
+        <p className="text-xs text-slate-400 mt-1">Separate keywords with commas.</p>
+      </div>
+    </div>
+  );
 }
