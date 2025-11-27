@@ -1,7 +1,6 @@
-import React from 'react';
-import { Star, Code, Cpu, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Star, Code, Cpu, TrendingUp, Filter } from 'lucide-react';
 
-// MOCK DATA
 const ALL_ELECTIVES = [
   { id: 1, title: 'Advanced Machine Learning', code: 'CS401', dept: 'CSE', rating: 4.8, tags: ['machine learning', 'ai', 'python'], icon: Code },
   { id: 2, title: 'Internet of Things', code: 'EC305', dept: 'ECE', rating: 4.2, tags: ['hardware', 'iot', 'embedded'], icon: Cpu },
@@ -10,45 +9,75 @@ const ALL_ELECTIVES = [
   { id: 5, title: 'Data Structures in Python', code: 'CS201', dept: 'CSE', rating: 4.3, tags: ['python', 'coding', 'algorithms'], icon: Code },
 ];
 
+const QUICK_FILTERS = ['All', 'CSE', 'ECE', 'Management', 'Web Dev'];
+
 export default function Electives({ userPreferences }) {
-  
-  // FILTERING LOGIC
+  const [activeFilter, setActiveFilter] = useState('All');
+
   const filteredElectives = ALL_ELECTIVES.filter(course => {
-    // If user has typed interests, check if the course tags match
+    // 1. Check Quick Filter (Clickable Chips)
+    const matchesQuickFilter = activeFilter === 'All' 
+      || course.dept === activeFilter 
+      || course.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase());
+
+    // 2. Check User Interest Search (Typed in Form)
+    let matchesSearch = true;
     if (userPreferences?.interests?.length > 0 && userPreferences.interests[0] !== "") {
-      const hasMatchingTag = course.tags.some(tag => 
+      matchesSearch = course.tags.some(tag => 
         userPreferences.interests.some(userInterest => tag.includes(userInterest))
       );
-      return hasMatchingTag;
     }
-    // If no interests typed, show all
-    return true; 
+
+    return matchesQuickFilter && matchesSearch;
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center mb-4 px-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400">Showing {filteredElectives.length} courses</span>
+    <div className="space-y-6">
+      {/* NEW: Quick Filter Chips */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+        {QUICK_FILTERS.map(filter => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap ${
+              activeFilter === filter 
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex justify-between items-center px-2">
+        <span className="text-sm text-slate-500 dark:text-slate-400">Found {filteredElectives.length} courses</span>
       </div>
 
       {filteredElectives.length === 0 ? (
-        <div className="text-center py-10 text-slate-400 dark:text-slate-500">
-          <p>No electives match your specific interests.</p>
-          <p className="text-sm">Try adding broader keywords like "coding" or "finance".</p>
+        <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 rounded-xl dark:border-slate-800">
+          <p>No electives match your filters.</p>
+          <button onClick={() => setActiveFilter('All')} className="text-indigo-600 font-medium text-sm mt-2 hover:underline">Clear Filters</button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredElectives.map((course) => (
             <div 
               key={course.id} 
-              className="group p-4 border border-slate-200 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all bg-white cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:border-indigo-700"
+              className="group p-4 border border-slate-200 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all bg-white cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:border-indigo-500 relative overflow-hidden"
             >
+              {/* Optional: "Top Pick" Badge if rating is high */}
+              {course.rating >= 4.8 && (
+                <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-1 rounded-bl-lg">TOP PICK</div>
+              )}
+
               <div className="flex justify-between items-start mb-2">
                 <div className="p-2 bg-indigo-50 rounded-md group-hover:bg-indigo-100 transition-colors dark:bg-slate-700 dark:group-hover:bg-slate-600">
                   <course.icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <div className="flex items-center gap-1 text-amber-500 font-medium text-sm">
-                  <Star className="w-4 h-4 fill-current" />
+                <div className="flex items-center gap-1 text-slate-600 font-medium text-sm dark:text-slate-400">
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                   {course.rating}
                 </div>
               </div>
