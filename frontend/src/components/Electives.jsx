@@ -1,49 +1,40 @@
 import React, { useState } from 'react';
-import { Star, Code, Cpu, TrendingUp, Filter } from 'lucide-react';
+import { Star, Code, Cpu, TrendingUp, Filter, ArrowRight } from 'lucide-react';
 
 const ALL_ELECTIVES = [
-  { id: 1, title: 'Advanced Machine Learning', code: 'CS401', dept: 'CSE', rating: 4.8, tags: ['machine learning', 'ai', 'python'], icon: Code },
-  { id: 2, title: 'Internet of Things', code: 'EC305', dept: 'ECE', rating: 4.2, tags: ['hardware', 'iot', 'embedded'], icon: Cpu },
-  { id: 3, title: 'Financial Engineering', code: 'HM201', dept: 'MECH', rating: 4.5, tags: ['finance', 'math', 'management'], icon: TrendingUp },
-  { id: 4, title: 'Full Stack Development', code: 'IT402', dept: 'IT', rating: 4.9, tags: ['web dev', 'react', 'nodejs'], icon: Code },
-  { id: 5, title: 'Data Structures in Python', code: 'CS201', dept: 'CSE', rating: 4.3, tags: ['python', 'coding', 'algorithms'], icon: Code },
+  { id: 1, title: 'Advanced Machine Learning', code: 'CS401', dept: 'CSE', rating: 4.8, students: 120, tags: ['ML', 'AI', 'Python'], icon: Code, color: 'text-blue-500', bg: 'bg-blue-50' },
+  { id: 2, title: 'Internet of Things', code: 'EC305', dept: 'ECE', rating: 4.2, students: 85, tags: ['IoT', 'Hardware'], icon: Cpu, color: 'text-purple-500', bg: 'bg-purple-50' },
+  { id: 3, title: 'Financial Engineering', code: 'HM201', dept: 'MECH', rating: 4.5, students: 92, tags: ['Finance', 'Math'], icon: TrendingUp, color: 'text-green-500', bg: 'bg-green-50' },
+  { id: 4, title: 'Full Stack Development', code: 'IT402', dept: 'IT', rating: 4.9, students: 230, tags: ['Web', 'React', 'Node'], icon: Code, color: 'text-orange-500', bg: 'bg-orange-50' },
+  { id: 5, title: 'Data Structures', code: 'CS201', dept: 'CSE', rating: 4.3, students: 150, tags: ['Python', 'Algo'], icon: Code, color: 'text-pink-500', bg: 'bg-pink-50' },
 ];
 
-const QUICK_FILTERS = ['All', 'CSE', 'ECE', 'Management', 'Web Dev'];
+const QUICK_FILTERS = ['All', 'CSE', 'ECE', 'Management', 'Web'];
 
 export default function Electives({ userPreferences }) {
   const [activeFilter, setActiveFilter] = useState('All');
 
   const filteredElectives = ALL_ELECTIVES.filter(course => {
-    // 1. Check Quick Filter (Clickable Chips)
-    const matchesQuickFilter = activeFilter === 'All' 
-      || course.dept === activeFilter 
-      || course.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase());
-
-    // 2. Check User Interest Search (Typed in Form)
+    const matchesQuickFilter = activeFilter === 'All' || course.dept === activeFilter || course.tags.some(t => t === activeFilter);
     let matchesSearch = true;
     if (userPreferences?.interests?.length > 0 && userPreferences.interests[0] !== "") {
-      matchesSearch = course.tags.some(tag => 
-        userPreferences.interests.some(userInterest => tag.includes(userInterest))
-      );
+      matchesSearch = course.tags.some(tag => userPreferences.interests.some(userInterest => tag.toLowerCase().includes(userInterest)));
     }
-
     return matchesQuickFilter && matchesSearch;
   });
 
   return (
     <div className="space-y-6">
-      {/* NEW: Quick Filter Chips */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+      {/* Filter Chips */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide mask-image-gradient">
         {QUICK_FILTERS.map(filter => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap ${
+            className={`px-4 py-2 text-xs font-bold rounded-full transition-all border ${
               activeFilter === filter 
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+              ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none' 
+              : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
             }`}
           >
             {filter}
@@ -51,55 +42,54 @@ export default function Electives({ userPreferences }) {
         ))}
       </div>
 
-      <div className="flex justify-between items-center px-2">
-        <span className="text-sm text-slate-500 dark:text-slate-400">Found {filteredElectives.length} courses</span>
-      </div>
-
-      {filteredElectives.length === 0 ? (
-        <div className="text-center py-10 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 rounded-xl dark:border-slate-800">
-          <p>No electives match your filters.</p>
-          <button onClick={() => setActiveFilter('All')} className="text-indigo-600 font-medium text-sm mt-2 hover:underline">Clear Filters</button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredElectives.map((course) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {filteredElectives.length === 0 ? (
+           <div className="col-span-2 text-center py-16 border-2 border-dashed border-slate-200 rounded-2xl dark:border-slate-700">
+             <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 dark:bg-slate-800">
+               <Filter className="w-6 h-6 text-slate-400" />
+             </div>
+             <p className="text-slate-500 font-medium dark:text-slate-400">No courses found matching filters.</p>
+             <button onClick={() => setActiveFilter('All')} className="text-indigo-600 font-bold text-sm mt-2 hover:underline">Clear all filters</button>
+           </div>
+        ) : (
+          filteredElectives.map((course) => (
             <div 
               key={course.id} 
-              className="group p-4 border border-slate-200 rounded-lg hover:border-indigo-300 hover:shadow-md transition-all bg-white cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:border-indigo-500 relative overflow-hidden"
+              className="group relative bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:shadow-none dark:hover:border-indigo-500/50"
             >
-              {/* Optional: "Top Pick" Badge if rating is high */}
-              {course.rating >= 4.8 && (
-                <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-1 rounded-bl-lg">TOP PICK</div>
-              )}
-
-              <div className="flex justify-between items-start mb-2">
-                <div className="p-2 bg-indigo-50 rounded-md group-hover:bg-indigo-100 transition-colors dark:bg-slate-700 dark:group-hover:bg-slate-600">
-                  <course.icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="flex justify-between items-start mb-4">
+                <div className={`p-3 rounded-xl ${course.bg} dark:bg-slate-700`}>
+                  <course.icon className={`w-6 h-6 ${course.color}`} />
                 </div>
-                <div className="flex items-center gap-1 text-slate-600 font-medium text-sm dark:text-slate-400">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  {course.rating}
+                <div className="flex items-center gap-1.5 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100 dark:bg-amber-900/20 dark:border-amber-900/50">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span className="text-xs font-bold text-amber-700 dark:text-amber-400">{course.rating}</span>
                 </div>
               </div>
               
-              <h3 className="font-bold text-slate-800 text-lg mb-1 dark:text-slate-100">{course.title}</h3>
-              <div className="flex items-center gap-2 text-xs text-slate-500 mb-3 dark:text-slate-400">
-                <span className="font-mono bg-slate-100 px-2 py-0.5 rounded dark:bg-slate-700 dark:text-slate-300">{course.code}</span>
-                <span>•</span>
-                <span>{course.dept}</span>
-              </div>
+              <h3 className="font-bold text-slate-800 text-lg mb-1 leading-tight dark:text-white group-hover:text-indigo-600 transition-colors">
+                {course.title}
+              </h3>
+              <p className="text-xs text-slate-500 font-medium mb-4 dark:text-slate-400">{course.code} • {course.dept}</p>
 
-              <div className="flex flex-wrap gap-2 mt-auto">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {course.tags.map(tag => (
-                  <span key={tag} className="text-xs px-2 py-1 bg-slate-50 text-slate-600 rounded-full border border-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600">
-                    #{tag}
+                  <span key={tag} className="text-[10px] uppercase tracking-wider font-bold px-2 py-1 bg-slate-50 text-slate-600 rounded-md border border-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600">
+                    {tag}
                   </span>
                 ))}
               </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-700">
+                <span className="text-xs text-slate-400 font-medium">{course.students} students enrolled</span>
+                <button className="p-2 rounded-full bg-slate-50 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all dark:bg-slate-700 dark:group-hover:bg-indigo-500">
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }
