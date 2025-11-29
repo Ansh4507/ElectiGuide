@@ -7,7 +7,7 @@
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
-![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
+
 
 ## 🌟 About The Project
 
@@ -102,20 +102,7 @@ frontend/
 └── ...
 
 
----
 
-## 📂 Project Structure
-
-```text
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── Electives.jsx    # Course grid, filtering logic, and modals
-│   │   ├── StudentForm.jsx  # Profile inputs and Strength Meter
-│   ├── App.jsx              # Main layout, Hero section, Theme provider
-│   ├── index.css            # Tailwind imports and custom animations
-│   └── main.jsx             # Entry point
-└── ...
 👤 Author
 Ansh Mishra Lead Developer & UI Designer
 
