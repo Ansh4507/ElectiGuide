@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Code, Cpu, TrendingUp, Filter, ArrowRight, X, CheckCircle, BookOpen, User, Calendar, Sparkles } from 'lucide-react';
+import { Star, Code, Cpu, TrendingUp, Filter, ArrowRight, X, CheckCircle, BookOpen, User, Calendar, Sparkles, Flame, Trophy, Award, Layers } from 'lucide-react';
 
+// --- MOCK DATA WITH VIBE TAGS ---
 const ALL_ELECTIVES = [
   { 
     id: 1, title: 'Advanced Machine Learning', code: 'CS401', dept: 'CSE', rating: 4.8, students: 120, 
     tags: ['ml', 'ai', 'python', 'data'], icon: Code, color: 'text-violet-600', bg: 'bg-violet-100',
+    vibes: ['Heavy Workload', 'Project Heavy'], // <--- NEW
     professor: 'Dr. S. Sharma',
     description: 'Deep dive into neural networks, reinforcement learning, and computer vision. Perfect for students targeting AI research roles.',
     syllabus: ['Neural Networks & Backprop', 'CNNs & RNNs', 'Reinforcement Learning', 'Generative AI (GANs)']
@@ -12,6 +14,7 @@ const ALL_ELECTIVES = [
   { 
     id: 2, title: 'Internet of Things (IoT)', code: 'EC305', dept: 'ECE', rating: 4.2, students: 85, 
     tags: ['iot', 'hardware', 'sensors', 'embedded'], icon: Cpu, color: 'text-cyan-600', bg: 'bg-cyan-100',
+    vibes: ['Project Heavy'], // <--- NEW
     professor: 'Prof. R. Gupta',
     description: 'Learn to connect physical devices to the internet. Covers sensors, microcontrollers (Arduino/ESP32), and cloud connectivity.',
     syllabus: ['Sensors & Actuators', 'Arduino & Raspberry Pi', 'MQTT Protocol', 'Cloud IoT Platforms']
@@ -19,6 +22,7 @@ const ALL_ELECTIVES = [
   { 
     id: 3, title: 'Financial Engineering', code: 'HM201', dept: 'MECH', rating: 4.5, students: 92, 
     tags: ['finance', 'math', 'management', 'economics'], icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-100',
+    vibes: ['Easy A'], // <--- NEW
     professor: 'Dr. A. Verma',
     description: 'Bridge the gap between engineering and finance. Learn about stock markets, risk analysis, and algorithmic trading.',
     syllabus: ['Time Value of Money', 'Risk Management', 'Derivatives & Options', 'Algorithmic Trading Basics']
@@ -26,6 +30,7 @@ const ALL_ELECTIVES = [
   { 
     id: 4, title: 'Full Stack Development', code: 'IT402', dept: 'IT', rating: 4.9, students: 230, 
     tags: ['web', 'react', 'node', 'javascript'], icon: Code, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100',
+    vibes: ['Great Prof', 'Project Heavy'], // <--- NEW
     professor: 'Mr. K. Patel',
     description: 'The complete guide to building modern web apps. Master the MERN stack and deploy real-world projects.',
     syllabus: ['React Hooks & State', 'Node.js & Express', 'MongoDB Database', 'Deployment (Vercel/AWS)']
@@ -33,6 +38,7 @@ const ALL_ELECTIVES = [
   { 
     id: 5, title: 'Data Structures in Python', code: 'CS201', dept: 'CSE', rating: 4.3, students: 150, 
     tags: ['python', 'algo', 'coding', 'structures'], icon: Code, color: 'text-rose-600', bg: 'bg-rose-100',
+    vibes: ['Heavy Workload', 'Great Prof'], // <--- NEW
     professor: 'Ms. L. Das',
     description: 'Master the fundamentals of DSA using Python. Essential for cracking technical interviews at top tech companies.',
     syllabus: ['Arrays & Linked Lists', 'Trees & Graphs', 'Dynamic Programming', 'Complexity Analysis']
@@ -41,7 +47,41 @@ const ALL_ELECTIVES = [
 
 const QUICK_FILTERS = ['All', 'CSE', 'ECE', 'Management', 'Web'];
 
-// --- SKELETON LOADER (High-End Shimmer) ---
+// --- HELPER: VIBE BADGE COMPONENT ---
+const VibeBadge = ({ vibe }) => {
+  let styles = '';
+  let Icon = Sparkles;
+
+  switch (vibe) {
+    case 'Heavy Workload':
+      styles = 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]'; // Red
+      Icon = Flame;
+      break;
+    case 'Easy A':
+      styles = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'; // Green
+      Icon = Trophy;
+      break;
+    case 'Great Prof':
+      styles = 'bg-sky-500/10 text-sky-500 border-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.1)]'; // Blue
+      Icon = Award;
+      break;
+    case 'Project Heavy':
+      styles = 'bg-purple-500/10 text-purple-500 border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.1)]'; // Purple
+      Icon = Layers;
+      break;
+    default:
+      styles = 'bg-slate-100 text-slate-500 border-slate-200';
+  }
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${styles}`}>
+      <Icon className="w-3 h-3" />
+      {vibe}
+    </span>
+  );
+};
+
+// --- SKELETON LOADER ---
 const SkeletonCard = () => (
   <div className="border border-white/40 rounded-[2rem] p-6 bg-white/40 dark:bg-white/5 dark:border-white/5 shadow-sm relative overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 animate-shimmer dark:via-white/5"></div>
@@ -165,7 +205,16 @@ export default function Electives({ userPreferences }) {
                 <h3 className="font-bold text-slate-800 text-xl mb-1 leading-tight dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                   {course.title}
                 </h3>
-                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-5 dark:text-slate-400">{course.code} • {course.dept}</p>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-4 dark:text-slate-400">{course.code} • {course.dept}</p>
+
+                {/* --- NEW: VIBE CHECK SECTION ON CARD --- */}
+                {course.vibes && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {course.vibes.map((vibe, idx) => (
+                      <VibeBadge key={idx} vibe={vibe} />
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex flex-wrap gap-2 mb-5">
                   {course.tags.map(tag => (
@@ -217,12 +266,13 @@ export default function Electives({ userPreferences }) {
                 </div>
                 <div>
                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">{selectedCourse.title}</h2>
-                   <div className="flex items-center gap-3 mt-3">
+                   <div className="flex flex-wrap items-center gap-3 mt-3">
                      <span className="font-mono bg-slate-900 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-lg shadow-slate-500/30 dark:shadow-none">{selectedCourse.code}</span>
-                     <span className="font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                       <BookOpen className="w-4 h-4 text-violet-500" />
-                       {selectedCourse.dept} Department
-                     </span>
+                     
+                     {/* VIBES IN MODAL */}
+                     {selectedCourse.vibes && selectedCourse.vibes.map((vibe, idx) => (
+                        <VibeBadge key={idx} vibe={vibe} />
+                     ))}
                    </div>
                 </div>
               </div>
