@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Code, Cpu, TrendingUp, Filter, ArrowRight, X, CheckCircle, BookOpen, User, Calendar, Sparkles, Flame, Trophy, Award, Layers } from 'lucide-react';
 
-// --- MOCK DATA WITH VIBE TAGS ---
 const ALL_ELECTIVES = [
   { 
     id: 1, title: 'Advanced Machine Learning', code: 'CS401', dept: 'CSE', rating: 4.8, students: 120, 
@@ -54,19 +53,19 @@ const VibeBadge = ({ vibe }) => {
 
   switch (vibe) {
     case 'Heavy Workload':
-      styles = 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]'; // Red
+      styles = 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]';
       Icon = Flame;
       break;
     case 'Easy A':
-      styles = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'; // Green
+      styles = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]';
       Icon = Trophy;
       break;
     case 'Great Prof':
-      styles = 'bg-sky-500/10 text-sky-500 border-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.1)]'; // Blue
+      styles = 'bg-sky-500/10 text-sky-500 border-sky-500/20 shadow-[0_0_10px_rgba(14,165,233,0.1)]';
       Icon = Award;
       break;
     case 'Project Heavy':
-      styles = 'bg-purple-500/10 text-purple-500 border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.1)]'; // Purple
+      styles = 'bg-purple-500/10 text-purple-500 border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.1)]';
       Icon = Layers;
       break;
     default:
@@ -107,6 +106,19 @@ export default function Electives({ userPreferences }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // NEW: SCROLL LOCK EFFECT
+  useEffect(() => {
+    if (selectedCourse) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    // Cleanup function to ensure scroll is re-enabled on component unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedCourse]); // Trigger whenever the modal opens/closes
+
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 600);
@@ -141,13 +153,13 @@ export default function Electives({ userPreferences }) {
   return (
     <div className="space-y-8">
       
-      {/* FILTER CHIPS */}
+      {/* FILTER CHIPS (Already has cursor-pointer from button base) */}
       <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide mask-image-gradient px-1">
         {QUICK_FILTERS.map(filter => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
-            className={`px-5 py-2.5 text-xs font-bold rounded-full transition-all duration-300 border backdrop-blur-sm ${
+            className={`cursor-pointer px-5 py-2.5 text-xs font-bold rounded-full transition-all duration-300 border backdrop-blur-sm ${
               activeFilter === filter 
               ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white border-transparent shadow-[0_0_20px_rgba(139,92,246,0.3)] scale-105' 
               : 'bg-white/60 text-slate-600 border-white/40 hover:bg-white hover:border-violet-300 hover:text-violet-600 dark:bg-white/5 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/10'
@@ -168,7 +180,7 @@ export default function Electives({ userPreferences }) {
              </div>
              <h3 className="text-lg font-bold text-slate-700 dark:text-white mb-2">No matching courses</h3>
              <p className="text-slate-500 font-medium dark:text-slate-400 mb-6 max-w-xs mx-auto">We couldn't find any electives matching your current filters.</p>
-             <button onClick={() => setActiveFilter('All')} className="text-violet-600 font-bold text-sm bg-violet-50 px-6 py-2 rounded-full hover:bg-violet-100 transition-colors dark:bg-violet-900/30 dark:text-violet-300 dark:hover:bg-violet-900/50">
+             <button onClick={() => setActiveFilter('All')} className="cursor-pointer text-violet-600 font-bold text-sm bg-violet-50 px-6 py-2 rounded-full hover:bg-violet-100 transition-colors dark:bg-violet-900/30 dark:text-violet-300 dark:hover:bg-violet-900/50">
                 Clear all filters
              </button>
            </div>
@@ -179,9 +191,10 @@ export default function Electives({ userPreferences }) {
               <div 
                 key={course.id} 
                 onClick={() => setSelectedCourse(course)}
+                // ADDED: cursor-pointer on the card itself
                 className="group relative bg-white/60 border border-white/60 rounded-[2rem] p-6 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-violet-300/50 hover:-translate-y-1 transition-all duration-500 cursor-pointer dark:bg-[#1A1A22]/60 dark:border-white/5 dark:hover:border-violet-500/30 dark:hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] backdrop-blur-sm"
               >
-                {/* Neon Match Badge */}
+                {/* Match Badge */}
                 {matchScore && (
                   <div className="absolute -top-3 right-5 bg-[#0F172A] border border-emerald-500/30 text-emerald-400 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center gap-1.5 animate-in zoom-in duration-300 z-10 backdrop-blur-md">
                     <span className="relative flex h-2 w-2">
@@ -207,7 +220,7 @@ export default function Electives({ userPreferences }) {
                 </h3>
                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-4 dark:text-slate-400">{course.code} • {course.dept}</p>
 
-                {/* --- NEW: VIBE CHECK SECTION ON CARD --- */}
+                {/* VIBE CHECK SECTION ON CARD */}
                 {course.vibes && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {course.vibes.map((vibe, idx) => (
@@ -229,7 +242,8 @@ export default function Electives({ userPreferences }) {
                      <User className="w-3.5 h-3.5" />
                      <span className="text-xs font-bold">{course.students} enrolled</span>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-all duration-300 dark:bg-white/5 dark:text-slate-400 dark:group-hover:bg-violet-500 dark:group-hover:text-white">
+                  {/* ADDED: cursor-pointer to the Quick View button */}
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-all duration-300 dark:bg-white/5 dark:text-slate-400 dark:group-hover:bg-violet-500 dark:group-hover:text-white cursor-pointer">
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -248,14 +262,15 @@ export default function Electives({ userPreferences }) {
           ></div>
 
           <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 dark:bg-[#0F1014] dark:border dark:border-white/10 ring-1 ring-black/5">
-            {/* Header Pattern Background */}
+            {/* Modal Header with Gradient */}
             <div className={`p-8 relative overflow-hidden`}>
               <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-overlay"></div>
               <div className={`absolute inset-0 opacity-10 bg-gradient-to-br from-slate-200 to-slate-400 dark:from-violet-900 dark:to-slate-900`}></div>
               
               <button 
                 onClick={() => setSelectedCourse(null)}
-                className="absolute top-6 right-6 p-2.5 bg-white/40 hover:bg-white rounded-full transition-all dark:bg-white/10 dark:text-white dark:hover:bg-white/20 z-10 backdrop-blur-md"
+                // ADDED: cursor-pointer here for clarity
+                className="absolute top-6 right-6 p-2.5 bg-white/40 hover:bg-white rounded-full transition-all dark:bg-white/10 dark:text-white dark:hover:bg-white/20 z-10 backdrop-blur-md cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -320,11 +335,11 @@ export default function Electives({ userPreferences }) {
             <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 dark:bg-[#121217] dark:border-white/5">
                <button 
                  onClick={() => setSelectedCourse(null)}
-                 className="px-6 py-3.5 font-bold text-sm text-slate-500 hover:bg-slate-200 rounded-xl transition-colors dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                 className="px-6 py-3.5 font-bold text-sm text-slate-500 hover:bg-slate-200 rounded-xl transition-colors dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white cursor-pointer"
                >
                  Close
                </button>
-               <button className="px-8 py-3.5 font-bold text-sm bg-slate-900 text-white rounded-xl shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:scale-105 transition-all dark:bg-white dark:text-black dark:hover:bg-slate-200">
+               <button className="px-8 py-3.5 font-bold text-sm bg-slate-900 text-white rounded-xl shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:scale-105 transition-all dark:bg-white dark:text-black dark:hover:bg-slate-200 cursor-pointer">
                  Add to Plan
                </button>
             </div>
